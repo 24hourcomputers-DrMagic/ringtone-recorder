@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private var micThread: Thread? = null
     @Volatile private var micRecording = false
     private var durationMs = 0L
+    private val srcIds = IntArray(3) { android.view.View.generateViewId() }
 
     private val projectionLauncher = registerForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
@@ -55,8 +56,8 @@ class MainActivity : AppCompatActivity() {
 
         sourceGroup = RadioGroup(this)
         listOf(getString(R.string.src_playback), getString(R.string.src_mic), getString(R.string.src_music))
-            .forEachIndexed { i, t -> sourceGroup.addView(RadioButton(this).apply { id = 100 + i; text = t }) }
-        sourceGroup.check(100)
+            .forEachIndexed { i, t -> sourceGroup.addView(RadioButton(this).apply { id = srcIds[i]; text = t }) }
+        sourceGroup.check(srcIds[0])
         root.addView(sourceGroup)
 
         val row = LinearLayout(this)
@@ -106,7 +107,7 @@ class MainActivity : AppCompatActivity() {
     private fun startRecording() {
         if (!hasMic()) { requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 1); return }
         player?.release(); player = null
-        if (sourceGroup.checkedRadioButtonId == 101) startMic()
+        if (sourceGroup.checkedRadioButtonId == srcIds[1]) startMic()
         else {
             val mpm = getSystemService(MediaProjectionManager::class.java)
             projectionLauncher.launch(mpm.createScreenCaptureIntent())
