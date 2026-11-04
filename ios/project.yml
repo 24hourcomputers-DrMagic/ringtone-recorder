@@ -1,0 +1,19 @@
+name: PickYourSound
+options: { bundleIdPrefix: com.drmagic, deploymentTarget: { iOS: "16.0" } }
+targets:
+  PickYourSound:
+    type: application
+    platform: iOS
+    sources: [PickYourSound]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.drmagic.pickyoursound
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: "Ringtone Pick Your Sound"
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: "Ringtone Pick Your Sound uses the microphone only while you tap Record, to capture a sound you can trim and export as a ringtone. Audio stays on your device."
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.0"
+        CODE_SIGNING_ALLOWED: NO

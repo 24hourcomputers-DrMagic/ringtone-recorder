@@ -1,0 +1,15 @@
+name: Build iOS (simulator, unsigned)
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  ios:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install xcodegen
+      - run: cd ios && xcodegen generate
+      - run: |
+          cd ios && xcodebuild -project PickYourSound.xcodeproj -scheme PickYourSound \
+            -sdk iphonesimulator -configuration Debug -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO build
+      - uses: actions/upload-artifact@v4
+        with: { name: ios-simulator-app, path: ios/build/Build/Products/Debug-iphonesimulator/*.app }

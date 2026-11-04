@@ -37,8 +37,8 @@ class MainActivity : AppCompatActivity() {
                 .putExtra(CaptureService.EXTRA_MODE, "playback")
                 .putExtra(CaptureService.EXTRA_CODE, res.resultCode)
                 .putExtra(CaptureService.EXTRA_DATA, res.data))
-            status.text = "Recording phone audio… press Stop when done."
-        } else status.text = "Screen-audio capture permission was declined."
+            status.text = getString(R.string.recording_playback)
+        } else status.text = getString(R.string.capture_declined)
     }
 
     private val doneReceiver = object : BroadcastReceiver() {
@@ -51,26 +51,26 @@ class MainActivity : AppCompatActivity() {
         val pad = (16 * resources.displayMetrics.density).toInt()
         val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(pad, pad, pad, pad) }
         root.addView(TextView(this).apply { text = getString(R.string.app_name); textSize = 26f; gravity = Gravity.CENTER })
-        root.addView(TextView(this).apply { text = "Pick your sound"; textSize = 18f; gravity = Gravity.CENTER; setPadding(0, 0, 0, pad) })
+        root.addView(TextView(this).apply { text = getString(R.string.tagline); textSize = 18f; gravity = Gravity.CENTER; setPadding(0, 0, 0, pad) })
 
         sourceGroup = RadioGroup(this)
-        listOf("1. Sound playing on the phone now", "2. Microphone (sounds around you)", "3. A segment of music you're listening to")
+        listOf(getString(R.string.src_playback), getString(R.string.src_mic), getString(R.string.src_music))
             .forEachIndexed { i, t -> sourceGroup.addView(RadioButton(this).apply { id = 100 + i; text = t }) }
         sourceGroup.check(100)
         root.addView(sourceGroup)
 
         val row = LinearLayout(this)
-        row.addView(Button(this).apply { text = "Record"; setOnClickListener { startRecording() } })
-        row.addView(Button(this).apply { text = "Stop"; setOnClickListener { stopRecording() } })
+        row.addView(Button(this).apply { text = getString(R.string.record); setOnClickListener { startRecording() } })
+        row.addView(Button(this).apply { text = getString(R.string.stop); setOnClickListener { stopRecording() } })
         root.addView(row)
 
-        status = TextView(this).apply { text = "Choose a source and tap Record."; setPadding(0, pad, 0, pad) }
+        status = TextView(this).apply { text = getString(R.string.choose_source); setPadding(0, pad, 0, pad) }
         root.addView(status)
 
         rangeLabel = TextView(this); root.addView(rangeLabel)
-        root.addView(TextView(this).apply { text = "Start" })
+        root.addView(TextView(this).apply { text = getString(R.string.start) })
         startBar = SeekBar(this); root.addView(startBar)
-        root.addView(TextView(this).apply { text = "End" })
+        root.addView(TextView(this).apply { text = getString(R.string.end) })
         endBar = SeekBar(this); root.addView(endBar)
         val l = object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(s: SeekBar?, p: Int, u: Boolean) {
@@ -85,12 +85,12 @@ class MainActivity : AppCompatActivity() {
         startBar.setOnSeekBarChangeListener(l); endBar.setOnSeekBarChangeListener(l)
 
         val row2 = LinearLayout(this)
-        row2.addView(Button(this).apply { text = "Preview"; setOnClickListener { preview() } })
-        row2.addView(Button(this).apply { text = "Set as ringtone"; setOnClickListener { setRingtone() } })
+        row2.addView(Button(this).apply { text = getString(R.string.preview); setOnClickListener { preview() } })
+        row2.addView(Button(this).apply { text = getString(R.string.set_ringtone); setOnClickListener { setRingtone() } })
         root.addView(row2)
         root.addView(TextView(this).apply {
             textSize = 12f; setPadding(0, pad, 0, 0)
-            text = "Note: apps that block audio capture (and calls) can't be recorded. Only use music you have the rights to."
+            text = getString(R.string.note)
         })
         setContentView(ScrollView(this).apply { addView(root) })
 
@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity() {
         val buf = maxOf(AudioRecord.getMinBufferSize(rate, AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT) * 2, 8192)
         val rec = AudioRecord(MediaRecorder.AudioSource.MIC, rate, AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT, buf)
         micRecording = true
-        status.text = "Recording microphone… press Stop when done."
+        status.text = getString(R.string.recording_mic)
         micThread = Thread {
             RandomAccessFile(CaptureService.outFile(this), "rw").use { raf ->
                 raf.setLength(0); WavWriter.writeHeader(raf, 0)
@@ -144,17 +144,17 @@ class MainActivity : AppCompatActivity() {
         val max = (durationMs / 100).toInt().coerceAtLeast(1)   // 0.1 s steps
         startBar.max = max; endBar.max = max
         startBar.progress = 0; endBar.progress = minOf(max, 300) // default first 30 s
-        status.text = "Recorded %.1f s. Trim with the sliders, preview, then set it.".format(durationMs / 1000.0)
+        status.text = getString(R.string.recorded_fmt, durationMs / 1000.0)
         updateRange()
     }
 
     private fun updateRange() {
-        rangeLabel.text = "Clip: %.1f s → %.1f s".format(startBar.progress / 10.0, endBar.progress / 10.0)
+        rangeLabel.text = getString(R.string.clip_fmt, startBar.progress / 10.0, endBar.progress / 10.0)
     }
 
     private fun trimmedFile(): File? {
         val src = CaptureService.outFile(this)
-        if (!src.exists() || endBar.progress <= startBar.progress) { toast("Record something and pick a range first."); return null }
+        if (!src.exists() || endBar.progress <= startBar.progress) { toast(getString(R.string.need_range)); return null }
         val dst = File(cacheDir, "trimmed.wav")
         WavWriter.trim(src, dst, startBar.progress * 100L, endBar.progress * 100L)
         return dst
@@ -168,7 +168,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setRingtone() {
         if (!Settings.System.canWrite(this)) {
-            toast("Allow \"Modify system settings\", then tap Set again.")
+            toast(getString(R.string.allow_write_settings))
             startActivity(Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:$packageName")))
             return
         }
@@ -182,12 +182,12 @@ class MainActivity : AppCompatActivity() {
             put(MediaStore.Audio.Media.IS_RINGTONE, true)
             put(MediaStore.Audio.Media.IS_PENDING, 1)
         }
-        val uri = contentResolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values) ?: run { toast("Couldn't save."); return }
+        val uri = contentResolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values) ?: run { toast(getString(R.string.save_failed)); return }
         contentResolver.openOutputStream(uri)!!.use { out -> f.inputStream().use { it.copyTo(out) } }
         values.clear(); values.put(MediaStore.Audio.Media.IS_PENDING, 0)
         contentResolver.update(uri, values, null, null)
         RingtoneManager.setActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE, uri)
-        toast("Ringtone set!"); status.text = "Saved to Ringtones/ and set as your ringtone."
+        toast(getString(R.string.ringtone_set)); status.text = getString(R.string.saved_and_set)
     }
 
     private fun toast(s: String) = Toast.makeText(this, s, Toast.LENGTH_LONG).show()

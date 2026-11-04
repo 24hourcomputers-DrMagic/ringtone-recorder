@@ -7,7 +7,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: '17' }
-      - run: chmod +x gradlew && ./gradlew --no-daemon assembleDebug
+      - run: chmod +x gradlew && ./gradlew --no-daemon assembleDebug lintDebug
       - uses: actions/upload-artifact@v4
         with:
           name: ringtone-pick-your-sound-debug-apk

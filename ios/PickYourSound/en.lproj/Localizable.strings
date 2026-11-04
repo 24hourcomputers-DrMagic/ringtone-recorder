@@ -1,0 +1,13 @@
+"tagline" = "Pick your sound";
+"record" = "Record";
+"stop" = "Stop";
+"preview" = "Preview";
+"export" = "Export ringtone (.m4r)";
+"start" = "Start";
+"end" = "End";
+"mic_only_note" = "iOS doesn't let apps record other apps' audio, so this version records from the microphone.";
+"mic_denied" = "Microphone access is off. Turn it on in Settings > Privacy > Microphone.";
+"howto_title" = "How to set it as your ringtone";
+"howto_body" = "1. Tap Export and choose “Save to Files”.\n2. Open GarageBand, import the .m4r from Files, then long-press the project > Share > Ringtone.\n3. Or on a Mac: drag the .m4r onto your iPhone in Finder.\nThen go to Settings > Sounds & Haptics > Ringtone.";
+"recorded" = "Recorded %.1f s";
+"clip" = "Clip: %.1f s → %.1f s (max 30 s)";

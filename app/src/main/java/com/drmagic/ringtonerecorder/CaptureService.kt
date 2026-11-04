@@ -96,14 +96,14 @@ class CaptureService : Service() {
 
     private fun startForegroundNotice(mode: String) {
         val nm = getSystemService(NotificationManager::class.java)
-        nm.createNotificationChannel(NotificationChannel("rec", "Recording", NotificationManager.IMPORTANCE_LOW))
+        nm.createNotificationChannel(NotificationChannel("rec", getString(R.string.notif_channel), NotificationManager.IMPORTANCE_LOW))
         val stop = PendingIntent.getService(this, 1, Intent(this, CaptureService::class.java).setAction(ACTION_STOP),
             PendingIntent.FLAG_IMMUTABLE)
         val n = Notification.Builder(this, "rec")
             .setContentTitle(getString(R.string.app_name))
-            .setContentText(if (mode == "mic") "Recording microphone…" else "Recording phone audio…")
+            .setContentText(getString(R.string.notif_text))
             .setSmallIcon(android.R.drawable.ic_btn_speak_now)
-            .addAction(Notification.Action.Builder(null, "Stop", stop).build())
+            .addAction(Notification.Action.Builder(null, getString(R.string.stop), stop).build())
             .setOngoing(true).build()
         startForeground(1, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
     }

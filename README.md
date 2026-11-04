@@ -12,6 +12,16 @@ Then: trim with start/end sliders → **Preview** → **Set as ringtone** (saved
 
 Recordings are 44.1 kHz 16-bit stereo WAV in app storage.
 
+## iOS version (`/ios`)
+SwiftUI, iOS 16+. Apple doesn't allow capturing other apps' audio or setting ringtones from an app, so iOS records from the **microphone only**, lets you trim/preview, and exports a `.m4r` (≤30 s) via the share sheet. Set it with GarageBand (Share › Ringtone) or Finder sync, then Settings › Sounds & Haptics.
+Build: `brew install xcodegen && cd ios && xcodegen generate && open PickYourSound.xcodeproj`. CI builds an unsigned simulator app.
+
+## Store readiness
+See [STORE-READINESS.md](STORE-READINESS.md).
+
+## Localization
+Strings live in `app/src/main/res/values/strings.xml` and `ios/PickYourSound/en.lproj/Localizable.strings`.
+
 ## Permissions
 `RECORD_AUDIO`, `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PROJECTION`, `POST_NOTIFICATIONS`, `WRITE_SETTINGS`.
 **No** phone-state, call-log or any call-related permissions.
