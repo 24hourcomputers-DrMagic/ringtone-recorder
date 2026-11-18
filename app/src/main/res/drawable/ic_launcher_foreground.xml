@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- stand -->
+    <path android:fillColor="#3D2C4A" android:pathData="M50,78h8v8h-8z"/>
+    <path android:fillColor="#3D2C4A" android:pathData="M38,86h32v5h-32z"/>
+    <!-- yoke -->
+    <path android:fillColor="#5B8CFF" android:pathData="M36,62c0,10 8,16 18,16s18,-6 18,-16h-6c0,6 -5,10 -12,10s-12,-4 -12,-10z"/>
+    <!-- body -->
+    <path android:fillColor="#FF7A59" android:pathData="M39,28c0,-8 7,-14 15,-14s15,6 15,14v28c0,8 -7,14 -15,14s-15,-6 -15,-14z"/>
+    <!-- shine -->
+    <path android:fillColor="#FFB199" android:pathData="M43,32c0,-6 4,-10 8,-11 0,0 -1,20 -1,28 0,6 -7,4 -7,-2z"/>
+    <!-- grille dots -->
+    <path android:fillColor="#3D2C4A" android:pathData="M50,50a1.8,1.8 0 1 1 0.1,0z"/>
+    <path android:fillColor="#3D2C4A" android:pathData="M58,50a1.8,1.8 0 1 1 0.1,0z"/>
+    <path android:fillColor="#3D2C4A" android:pathData="M50,55a1.8,1.8 0 1 1 0.1,0z"/>
+    <path android:fillColor="#3D2C4A" android:pathData="M58,55a1.8,1.8 0 1 1 0.1,0z"/>
+    <path android:fillColor="#3D2C4A" android:pathData="M54,60a1.8,1.8 0 1 1 0.1,0z"/>
+    <!-- eyes -->
+    <path android:fillColor="#FFFFFF" android:pathData="M46,36a5,6 0 1 1 0.1,0z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M62,36a5,6 0 1 1 0.1,0z"/>
+    <path android:fillColor="#3D2C4A" android:pathData="M47,37a2.5,3 0 1 1 0.1,0z"/>
+    <path android:fillColor="#3D2C4A" android:pathData="M63,37a2.5,3 0 1 1 0.1,0z"/>
+    <!-- cheeks and smile -->
+    <path android:fillColor="#FFB4A2" android:pathData="M42,46a3,2 0 1 1 0.1,0z"/>
+    <path android:fillColor="#FFB4A2" android:pathData="M66,46a3,2 0 1 1 0.1,0z"/>
+    <path android:fillColor="#00000000" android:strokeColor="#3D2C4A" android:strokeWidth="1.8"
+        android:strokeLineCap="round" android:pathData="M48,47c2,4 10,4 12,0"/>
+    <!-- notes -->
+    <path android:fillColor="#5B8CFF" android:pathData="M74,28v16h-3v-10l8,-2v-4z"/>
+    <path android:fillColor="#5B8CFF" android:pathData="M71,42a3.5,2.5 0 1 1 0.1,0z"/>
+    <path android:fillColor="#3ECF8E" android:pathData="M32,30v12h-2.5v-8l6,-1.5v-2.5z"/>
+    <path android:fillColor="#3ECF8E" android:pathData="M29.5,40a3,2 0 1 1 0.1,0z"/>
+</vector>

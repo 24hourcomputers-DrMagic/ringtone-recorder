@@ -8,9 +8,13 @@ Pick a source:
 2. **Microphone** — `AudioRecord` from the mic while the app is open.
 3. **A segment of music you're listening to** — same playback capture as (1); start/stop around the part you want.
 
+4. **Upload your own sound** — system file picker (`ACTION_OPEN_DOCUMENT`, `audio/*`), no storage permission. MP3, M4A, WAV, and OGG (and other formats the device can decode) are converted to WAV, then enter the same trim flow.
+
 Then: trim with start/end sliders → **Preview** → **Set as ringtone** (saved to `Ringtones/` in MediaStore with `IS_RINGTONE=true`, set via `RingtoneManager.setActualDefaultRingtoneUri` after you grant "Modify system settings").
 
-Recordings are 44.1 kHz 16-bit stereo WAV in app storage.
+Optional: **Add contacts if you want specific sounds for specific friends** — contacts permissions are requested only if you tap this, then a contact picker can assign (or reset) that person's custom ringtone.
+
+Recordings and imports are 44.1 kHz 16-bit stereo WAV in app storage.
 
 ## iOS version (`/ios`)
 SwiftUI, iOS 16+. Apple doesn't allow capturing other apps' audio or setting ringtones from an app, so iOS records from the **microphone only**, lets you trim/preview, and exports a `.m4r` (≤30 s) via the share sheet. Set it with GarageBand (Share › Ringtone) or Finder sync, then Settings › Sounds & Haptics.
@@ -24,7 +28,8 @@ Strings live in `app/src/main/res/values/strings.xml` and `ios/PickYourSound/en.
 
 ## Permissions
 `RECORD_AUDIO`, `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PROJECTION`, `POST_NOTIFICATIONS`, `WRITE_SETTINGS`.
-**No** phone-state, call-log or any call-related permissions.
+Optional, requested only when you tap "Choose a friend": `READ_CONTACTS`, `WRITE_CONTACTS`.
+**No** phone-state, call-log or any call-related permissions. Upload uses the system document picker and does not need a storage permission.
 
 ## Build
 - Requirements: JDK 17, Android SDK 35.
