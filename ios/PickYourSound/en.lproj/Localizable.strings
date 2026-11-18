@@ -11,3 +11,7 @@
 "howto_body" = "1. Tap Export and choose “Save to Files”.\n2. Open GarageBand, import the .m4r from Files, then long-press the project > Share > Ringtone.\n3. Or on a Mac: drag the .m4r onto your iPhone in Finder.\nThen go to Settings > Sounds & Haptics > Ringtone.";
 "recorded" = "Recorded %.1f s";
 "clip" = "Clip: %.1f s → %.1f s (max 30 s)";
+
+"house_ad_title" = "From the same developer";
+"house_ad_body" = "Help and Win — free contest links";
+"house_ad_dismiss" = "Dismiss";

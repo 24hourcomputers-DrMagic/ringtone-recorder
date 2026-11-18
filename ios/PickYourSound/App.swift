@@ -6,8 +6,9 @@ struct PickYourSoundApp: App {
     var body: some Scene { WindowGroup { ContentView() } }
 }
 
-final class AudioModel: NSObject, ObservableObject, AVAudioRecorderDelegate {
+final class AudioModel: NSObject, ObservableObject, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
     @Published var isRecording = false
+    @Published var isPlaying = false
     @Published var duration: Double = 0
     @Published var start: Double = 0
     @Published var end: Double = 0
@@ -71,8 +72,14 @@ final class AudioModel: NSObject, ObservableObject, AVAudioRecorderDelegate {
             guard let url else { return }
             try? AVAudioSession.sharedInstance().setCategory(.playback)
             self.player = try? AVAudioPlayer(contentsOf: url)
+            self.player?.delegate = self
+            self.isPlaying = true
             self.player?.play()
         }
+    }
+
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        isPlaying = false
     }
 }
 
@@ -84,9 +91,37 @@ struct ShareSheet: UIViewControllerRepresentable {
     func updateUIViewController(_ vc: UIActivityViewController, context: Context) {}
 }
 
+struct HouseAdBanner: View {
+    var onOpen: () -> Void
+    var onDismiss: () -> Void
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Button(action: onOpen) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("house_ad_title").font(.caption).foregroundStyle(.secondary)
+                    Text("house_ad_body").font(.headline).multilineTextAlignment(.leading)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .buttonStyle(.plain)
+            Button(action: onDismiss) {
+                Image(systemName: "xmark")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .padding(8)
+            }
+            .accessibilityLabel(Text("house_ad_dismiss"))
+        }
+        .padding(12)
+        .background(RoundedRectangle(cornerRadius: 12).fill(Color(.secondarySystemBackground)))
+    }
+}
+
 struct ContentView: View {
     @StateObject private var m = AudioModel()
     @State private var share: URL?
+    @AppStorage("house_ad_dismissed") private var adDismissed = false
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         ScrollView {
@@ -115,6 +150,16 @@ struct ContentView: View {
                     GroupBox(label: Text("howto_title")) { Text("howto_body").font(.footnote) }
                 }
                 if let msg = m.message { Text(msg).foregroundStyle(.red) }
+                if !adDismissed && !m.isRecording && !m.isPlaying {
+                    HouseAdBanner(
+                        onOpen: {
+                            if let url = URL(string: "https://helpandwin.ca") {
+                                openURL(url)
+                            }
+                        },
+                        onDismiss: { adDismissed = true }
+                    )
+                }
             }.padding()
         }
         .sheet(item: $share) { ShareSheet(url: $0) }

@@ -12,9 +12,11 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
 import android.view.Gravity
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.google.android.material.card.MaterialCardView
 import java.io.File
 import java.io.RandomAccessFile
 
@@ -24,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var endBar: SeekBar
     private lateinit var rangeLabel: TextView
     private lateinit var sourceGroup: RadioGroup
+    private lateinit var houseAd: View
     private var player: MediaPlayer? = null
     private var micThread: Thread? = null
     @Volatile private var micRecording = false
@@ -39,6 +42,7 @@ class MainActivity : AppCompatActivity() {
                 .putExtra(CaptureService.EXTRA_CODE, res.resultCode)
                 .putExtra(CaptureService.EXTRA_DATA, res.data))
             status.text = getString(R.string.recording_playback)
+            refreshHouseAd()
         } else status.text = getString(R.string.capture_declined)
     }
 
@@ -93,13 +97,78 @@ class MainActivity : AppCompatActivity() {
             textSize = 12f; setPadding(0, pad, 0, 0)
             text = getString(R.string.note)
         })
+        houseAd = buildHouseAd(pad)
+        root.addView(houseAd)
         setContentView(ScrollView(this).apply { addView(root) })
+        refreshHouseAd()
 
         ContextCompat.registerReceiver(this, doneReceiver, IntentFilter(CaptureService.ACTION_DONE), ContextCompat.RECEIVER_NOT_EXPORTED)
         val perms = mutableListOf(Manifest.permission.RECORD_AUDIO)
         if (Build.VERSION.SDK_INT >= 33) perms += Manifest.permission.POST_NOTIFICATIONS
         requestPermissions(perms.toTypedArray(), 1)
         if (CaptureService.outFile(this).exists()) onRecordingReady()
+    }
+
+    private fun buildHouseAd(pad: Int): View {
+        val density = resources.displayMetrics.density
+        val card = MaterialCardView(this).apply {
+            radius = 12 * density
+            cardElevation = 2 * density
+            useCompatPadding = true
+            isClickable = true
+            isFocusable = true
+            contentDescription = "${getString(R.string.house_ad_title)}. ${getString(R.string.house_ad_body)}"
+            setOnClickListener { openHelpAndWin() }
+            val lp = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            lp.topMargin = pad
+            layoutParams = lp
+        }
+        val row = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(pad, pad, pad / 2, pad)
+        }
+        val textCol = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+        }
+        textCol.addView(TextView(this).apply {
+            text = getString(R.string.house_ad_title)
+            textSize = 12f
+        })
+        textCol.addView(TextView(this).apply {
+            text = getString(R.string.house_ad_body)
+            textSize = 16f
+            setPadding(0, (4 * density).toInt(), 0, 0)
+        })
+        row.addView(textCol)
+        row.addView(ImageButton(this).apply {
+            setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
+            contentDescription = getString(R.string.house_ad_dismiss)
+            setBackgroundColor(0)
+            setOnClickListener {
+                getSharedPreferences(PREFS, MODE_PRIVATE).edit().putBoolean(PREF_AD_DISMISSED, true).apply()
+                refreshHouseAd()
+            }
+        })
+        card.addView(row)
+        return card
+    }
+
+    private fun openHelpAndWin() {
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.house_ad_url))))
+    }
+
+    private fun isBusy(): Boolean =
+        micRecording || CaptureService.isRecording || player?.isPlaying == true
+
+    private fun refreshHouseAd() {
+        if (!::houseAd.isInitialized) return
+        val dismissed = getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean(PREF_AD_DISMISSED, false)
+        houseAd.visibility = if (dismissed || isBusy()) View.GONE else View.VISIBLE
     }
 
     private fun hasMic() = checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
@@ -121,6 +190,7 @@ class MainActivity : AppCompatActivity() {
         val rec = AudioRecord(MediaRecorder.AudioSource.MIC, rate, AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT, buf)
         micRecording = true
         status.text = getString(R.string.recording_mic)
+        refreshHouseAd()
         micThread = Thread {
             RandomAccessFile(CaptureService.outFile(this), "rw").use { raf ->
                 raf.setLength(0); WavWriter.writeHeader(raf, 0)
@@ -147,6 +217,7 @@ class MainActivity : AppCompatActivity() {
         startBar.progress = 0; endBar.progress = minOf(max, 300) // default first 30 s
         status.text = getString(R.string.recorded_fmt, durationMs / 1000.0)
         updateRange()
+        refreshHouseAd()
     }
 
     private fun updateRange() {
@@ -164,7 +235,13 @@ class MainActivity : AppCompatActivity() {
     private fun preview() {
         val f = trimmedFile() ?: return
         player?.release()
-        player = MediaPlayer().apply { setDataSource(f.path); prepare(); start() }
+        player = MediaPlayer().apply {
+            setDataSource(f.path)
+            setOnCompletionListener { refreshHouseAd() }
+            prepare()
+            start()
+        }
+        refreshHouseAd()
     }
 
     private fun setRingtone() {
@@ -194,4 +271,9 @@ class MainActivity : AppCompatActivity() {
     private fun toast(s: String) = Toast.makeText(this, s, Toast.LENGTH_LONG).show()
 
     override fun onDestroy() { unregisterReceiver(doneReceiver); player?.release(); micRecording = false; super.onDestroy() }
+
+    companion object {
+        private const val PREFS = "pys"
+        private const val PREF_AD_DISMISSED = "house_ad_dismissed"
+    }
 }

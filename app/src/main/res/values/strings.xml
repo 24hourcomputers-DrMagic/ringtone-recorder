@@ -24,4 +24,8 @@
     <string name="clip_fmt">Clip: %1$.1f s → %2$.1f s</string>
     <string name="notif_channel">Recording</string>
     <string name="notif_text">Recording phone audio…</string>
+    <string name="house_ad_title">From the same developer</string>
+    <string name="house_ad_body">Help and Win — free contest links</string>
+    <string name="house_ad_dismiss">Dismiss</string>
+    <string name="house_ad_url">https://helpandwin.ca</string>
 </resources>

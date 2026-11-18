@@ -38,3 +38,7 @@ iOS cannot capture other apps' audio or set ringtones programmatically, so the i
 - Localization: all UI strings are in `values/strings.xml` (Android) and `en.lproj/Localizable.strings` (iOS); add `values-xx/` and `xx.lproj/` folders to translate.
 - Copyright: recording music for a ringtone is for personal use; distribution rights vary by country. In-app note included.
 - Not handled yet: real launcher icons, release signing, crash-free testing on physical devices across Android 10–15 and iOS 16–18.
+
+## House ad (Help and Win)
+A dismissible first-party banner on the home screen (hidden during record/preview) links to https://helpandwin.ca. No ad SDK, no tracking, no INTERNET permission — the tap opens the system browser. The app stays free.
+Play Console "Contains ads": the form's wording includes ads you serve yourself, so declare **Yes** to be strictly correct. There is no ad network.
