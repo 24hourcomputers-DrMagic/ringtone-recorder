@@ -9,6 +9,7 @@ import android.media.*
 import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
 import android.os.IBinder
+import androidx.core.content.IntentCompat
 import java.io.File
 import java.io.RandomAccessFile
 
@@ -46,8 +47,7 @@ class CaptureService : Service() {
         record = try {
             if (mode == "playback") {
                 val mpm = getSystemService(MediaProjectionManager::class.java)
-                @Suppress("DEPRECATION")
-                val data: Intent = intent!!.getParcelableExtra(EXTRA_DATA)!!
+                val data: Intent = IntentCompat.getParcelableExtra(intent!!, EXTRA_DATA, Intent::class.java)!!
                 projection = mpm.getMediaProjection(intent.getIntExtra(EXTRA_CODE, 0), data)
                 projection!!.registerCallback(object : MediaProjection.Callback() {
                     override fun onStop() { stopRecording() }

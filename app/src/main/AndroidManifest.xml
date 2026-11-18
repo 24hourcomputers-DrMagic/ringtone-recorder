@@ -11,10 +11,12 @@
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <application
         android:allowBackup="false"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
-        android:theme="@style/Theme.PickYourSound">
+        android:theme="@style/Theme.PickYourSound"
+        tools:targetApi="33">
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

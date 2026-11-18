@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.*
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.media.*
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
@@ -15,10 +16,14 @@ import android.provider.Settings
 import android.view.Gravity
 import android.view.View
 import android.widget.*
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import java.io.File
@@ -77,6 +82,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Android 15+ draws edge-to-edge for apps targeting 35+, and Android 16 (API 36) removes the
+        // opt-out. Draw behind transparent bars with dark icons (the UI is always light cream) and pad
+        // the content by the system-bar / cutout insets below.
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+        )
         super.onCreate(savedInstanceState)
         title = getString(R.string.app_name)
         val pad = dp(16)
@@ -205,10 +217,16 @@ class MainActivity : AppCompatActivity() {
         })
         houseAd = buildHouseAd(pad)
         root.addView(houseAd)
-        setContentView(ScrollView(this).apply {
+        val scroll = ScrollView(this).apply {
             setBackgroundColor(color(R.color.cream))
             addView(root)
-        })
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(scroll) { v, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            v.setPadding(bars.left, bars.top, bars.right, bars.bottom)
+            insets
+        }
+        setContentView(scroll)
         refreshHouseAd()
 
         ContextCompat.registerReceiver(this, doneReceiver, IntentFilter(CaptureService.ACTION_DONE), ContextCompat.RECEIVER_NOT_EXPORTED)

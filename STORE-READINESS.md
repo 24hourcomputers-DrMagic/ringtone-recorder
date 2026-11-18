@@ -5,7 +5,8 @@ Not legal advice. This is an engineering checklist against store policies.
 ## Google Play (Android)
 | Item | Status |
 |---|---|
-| Target SDK 35, minSdk 29. **Play (as of 31 Aug 2026) requires targetSdk 36 for new apps and updates** | ⚠️ bump compileSdk/targetSdk to 36 before a Play upload |
+| compileSdk/targetSdk **36** (Android 16), minSdk 29, version 1.2 (code 3). Meets Play's targetSdk 36 requirement for new apps and updates (from 31 Aug 2026) | ✅ |
+| Android 16 behavior changes reviewed (see section below) | ✅ builds + lint clean; ⏳ real-device test |
 | Permissions: RECORD_AUDIO, FOREGROUND_SERVICE, FOREGROUND_SERVICE_MEDIA_PROJECTION, POST_NOTIFICATIONS, WRITE_SETTINGS, plus optional READ_CONTACTS / WRITE_CONTACTS | ✅ |
 | No READ_PHONE_STATE / call log / call audio / SMS | ✅ (playback capture cannot hear calls by OS design) |
 | Foreground service type `mediaProjection` declared in manifest and in `startForeground` | ✅ |
@@ -37,7 +38,7 @@ iOS cannot capture other apps' audio or set ringtones programmatically, so the i
 ## Global
 - Localization: all UI strings are in `values/strings.xml` (Android) and `en.lproj/Localizable.strings` (iOS); add `values-xx/` and `xx.lproj/` folders to translate.
 - Copyright: recording music for a ringtone is for personal use; distribution rights vary by country. In-app note included.
-- Not handled yet: release signing, Play listing graphics, crash-free testing on physical devices across Android 10–16 and iOS 16–18.
+- Not handled yet: crash-free testing on physical devices across Android 10–16 and iOS 16–18.
 
 
 
@@ -52,3 +53,20 @@ The "Add contacts if you want specific sounds for specific friends" action is op
 ## House ad (Help and Win)
 A dismissible first-party banner on the home screen (hidden during record/preview) links to https://helpandwin.ca. No ad SDK, no tracking, no INTERNET permission — the tap opens the system browser. The app stays free.
 Play Console "Contains ads": the form's wording includes ads you serve yourself, so declare **Yes** to be strictly correct. There is no ad network.
+
+
+## Android 16 / targetSdk 36 review (v1.2)
+Build: AGP 8.13.0, Gradle 8.13, compileSdk/targetSdk 36. `./gradlew assembleDebug lintDebug` passes locally.
+| Change for apps targeting 36 | What this app does |
+|---|---|
+| Edge-to-edge opt-out (`windowOptOutEdgeToEdgeEnforcement`) removed | Never used it. `MainActivity` now calls `enableEdgeToEdge()` (transparent bars, dark icons on the light UI) and pads the scroll view by system-bar + display-cutout insets. Removed the no-op `statusBarColor` / `navigationBarColor` theme items. |
+| Predictive back on by default; `onBackPressed` / `KEYCODE_BACK` no longer delivered | The app never intercepts back (no `onBackPressed`, no key handling), so system back simply closes the single activity. `android:enableOnBackInvokedCallback="true"` is now explicit in the manifest so Android 13–15 also get the predictive animation. |
+| Adaptive layouts: orientation / resizability / aspect-ratio locks ignored on large screens | No locks declared; the layout is a single scrolling column, so it already resizes. |
+| `elegantTextHeight` ignored | Not used. |
+| Safer Intents (explicit intents must match filters) | Only explicit intents to its own non-exported `CaptureService`; system intents (`ACTION_OPEN_DOCUMENT`, `PickContact`, `ACTION_MANAGE_WRITE_SETTINGS`, `ACTION_VIEW` for the house ad) are implicit system actions. |
+| MediaProjection / FGS / audio capture | No new API-36 rules for `mediaProjection` FGS. The Android 14+ rules still hold and are met: FGS type `mediaProjection` + `FOREGROUND_SERVICE_MEDIA_PROJECTION`, `startForeground` before `getMediaProjection`, fresh user consent each session, `MediaProjection.Callback` registered. The deprecated `getParcelableExtra(String)` was replaced with `IntentCompat.getParcelableExtra`. |
+| Permissions | No API-36 permission changes affect this app (the new ones cover health data and local-network access; the app has no network permission). Media read permissions are not needed: upload uses the system document picker. |
+| JobScheduler quota changes | App uses no jobs/WorkManager. |
+| 16 KB page size (Play, Nov 2025) | Pure Kotlin, no native `.so` libraries, so nothing to realign. |
+
+Device testing: not done on a physical phone. Smoke-tested only on a headless Android 16 (API 36) emulator — see the release notes / owner report.
