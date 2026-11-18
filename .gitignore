@@ -6,3 +6,7 @@ local.properties
 .idea/
 ios/build/
 ios/*.xcodeproj/
+# Signing secrets: never commit (see SIGNING.md)
+*.jks
+*.keystore
+keystore.properties

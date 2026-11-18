@@ -16,7 +16,7 @@ Not legal advice. This is an engineering checklist against store policies.
 | Data safety: audio is recorded or imported and stored **on device only**, not collected/shared; no account, no analytics, no network permission. Optional contacts access is used only to write/reset that contact's `CUSTOM_RINGTONE` on the device — names and numbers are not collected, stored in the app, or shared | ✅ draft: audio and (optional) contacts used on-device only; no data collected off the device |
 | Privacy policy URL (required because RECORD_AUDIO **and** optional contacts permissions) | ⏳ you host one (e.g. GitHub Pages) — must mention microphone, optional contacts, and that nothing is uploaded |
 | Content rating questionnaire, target audience 13+ | ⏳ you |
-| Release signing (Play App Signing) + AAB (`./gradlew bundleRelease`) | ⏳ needs your upload key |
+| Release signing (Play App Signing) + AAB (`./gradlew bundleRelease`) | ✅ release `signingConfig` reads `keystore.properties` or `RELEASE_*` env vars (unsigned fallback); see `SIGNING.md`. An upload key exists outside the repo; ⏳ you back it up and enroll in Play App Signing |
 | Personal dev accounts: 12 testers × 14 days closed test | ⏳ you |
 | IP policy: describe as "record sounds", don't advertise ripping copyrighted songs | ⚠️ listing wording |
 | Store assets: 512px icon, feature graphic, screenshots | ⏳ app now has a cartoon adaptive launcher icon; Play listing still needs a 512px icon, feature graphic, and device screenshots |
