@@ -41,3 +41,9 @@ Optional, requested only when you tap "Choose a friend": `READ_CONTACTS`, `WRITE
 - Apps that opt out of capture (many streaming apps, all calls, system sounds) record as silence.
 - Microphone recording stops if you leave the app.
 - **Copyright:** music segments are for personal use only; only use audio you have the rights to.
+
+## Google Play prep
+- `SIGNING.md`: upload key and release signing (`./gradlew bundleRelease`)
+- `PRIVACY.md` / `docs/privacy.html`: privacy policy (host it, e.g. GitHub Pages from `/docs`)
+- `STORE_LISTING.md` + `store/`: listing copy, icon, feature graphic, screenshots, data-safety and rating answers
+- `STORE-READINESS.md`: checklist, including the Android 16 / targetSdk 36 review

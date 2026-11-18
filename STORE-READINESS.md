@@ -18,8 +18,8 @@ Not legal advice. This is an engineering checklist against store policies.
 | Content rating questionnaire, target audience 13+ | ⏳ you |
 | Release signing (Play App Signing) + AAB (`./gradlew bundleRelease`) | ✅ release `signingConfig` reads `keystore.properties` or `RELEASE_*` env vars (unsigned fallback); see `SIGNING.md`. An upload key exists outside the repo; ⏳ you back it up and enroll in Play App Signing |
 | Personal dev accounts: 12 testers × 14 days closed test | ⏳ you |
-| IP policy: describe as "record sounds", don't advertise ripping copyrighted songs | ⚠️ listing wording |
-| Store assets: 512px icon, feature graphic, screenshots | ⏳ app now has a cartoon adaptive launcher icon; Play listing still needs a 512px icon, feature graphic, and device screenshots |
+| IP policy: describe as "record sounds", don't advertise ripping copyrighted songs | ✅ `STORE_LISTING.md` wording follows this |
+| Store assets: 512px icon, feature graphic, screenshots | ✅ `store/icon-512.png`, `store/feature-graphic-1024x500.png`, 5 phone screenshots (1080×1920, from the API 36 emulator) in `store/screenshots/`; copy, data-safety and rating answers in `STORE_LISTING.md` |
 
 ## Apple App Store (iOS, `/ios`)
 iOS cannot capture other apps' audio or set ringtones programmatically, so the iOS build is **microphone-only** and exports a 30-second-max `.m4r` via the share sheet, with GarageBand/Finder instructions.
